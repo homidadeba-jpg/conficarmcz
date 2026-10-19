@@ -174,7 +174,11 @@ function Hero() {
     <div className="hero-visual" aria-hidden="true">
       <img className="hero-poster" src="/images/hero-inicio.webp" width="720" height="1280" fetchPriority="high" alt="" />
       <canvas ref={canvas} className="hero-canvas" />
-      <img className="hero-extended" src="/images/hero-final.webp" width="720" height="1280" alt="" />
+      <img className="hero-extended" src="/images/hero-final-v2.webp" width="720" height="1280" alt="" onLoad={event => event.currentTarget.classList.add('is-loaded')} onError={event => {
+        const image = event.currentTarget;
+        image.classList.remove('is-loaded');
+        if (!image.dataset.fallback) { image.dataset.fallback = 'true'; image.src = '/frames/071.webp'; }
+      }} />
     </div>
     <div className="hero-shade" />
     <div className="container hero-inner">

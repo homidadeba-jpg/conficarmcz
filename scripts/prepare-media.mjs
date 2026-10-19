@@ -30,7 +30,14 @@ execFileSync(ffmpeg, ['-y', '-i', video, '-vf', 'fps=12.2,scale=432:768', '-fram
 const count = (await fs.readdir('public/frames')).filter(name => name.endsWith('.webp')).length;
 await fs.writeFile('public/frames/manifest.json', JSON.stringify({ count, width: 432, height: 768 }));
 await fs.copyFile('public/frames/000.webp', 'public/images/hero-inicio.webp');
-execFileSync(ffmpeg, ['-y', '-sseof', '-0.08', '-i', video, '-frames:v', '1', '-c:v', 'libwebp', '-quality', '88', 'public/images/hero-final.webp'], { stdio: 'pipe' });
+// The audio runs past the last video frame. Seeking relative to the container's
+// end produced an empty WebP. Decode the final half-second and keep its last frame.
+const finalImage = 'public/images/hero-final-v2.webp';
+execFileSync(ffmpeg, ['-y', '-ss', '5.5', '-i', video, '-an', '-c:v', 'libwebp', '-quality', '88', '-f', 'image2', '-update', '1', finalImage], { stdio: 'pipe' });
+const finalMetadata = await sharp(finalImage).metadata();
+if (finalMetadata.width !== 720 || finalMetadata.height !== 1280) throw new Error('Invalid final hero image');
+// Preserve the former URL for clients still using an earlier JavaScript bundle.
+await fs.copyFile(finalImage, 'public/images/hero-final.webp');
 await sharp(`${batch}/1-1002514484.jpg`).resize(1200, 630, { fit: 'cover', position: 'centre' }).jpeg({ quality: 86 }).toFile('public/images/social.jpg');
 const files = await fs.readdir('public/frames');
 let size = 0;
