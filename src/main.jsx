@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowUpRightIcon, ArrowRightIcon, ArrowLeftIcon, WhatsappLogoIcon, InstagramLogoIcon, MapPinIcon, PhoneIcon, ListIcon, XIcon, BatteryChargingIcon, DropIcon, DiscIcon, WrenchIcon, SteeringWheelIcon, LightningIcon, ShieldCheckIcon, CheckIcon, StarIcon, PlusIcon, EngineIcon, ThermometerIcon, TireIcon } from '@phosphor-icons/react';
+import { ArrowUpRightIcon, ArrowDownIcon, ArrowRightIcon, ArrowLeftIcon, WhatsappLogoIcon, InstagramLogoIcon, MapPinIcon, PhoneIcon, ListIcon, XIcon, BatteryChargingIcon, DropIcon, DiscIcon, WrenchIcon, SteeringWheelIcon, LightningIcon, ShieldCheckIcon, CheckIcon, StarIcon, PlusIcon, EngineIcon, ThermometerIcon, TireIcon } from '@phosphor-icons/react';
 import '@fontsource/anton/latin-400.css';
 import '@fontsource-variable/montserrat';
 import './styles.css';
@@ -131,12 +131,15 @@ function Hero() {
         frames[index] = img;
         img.src = `/frames/${String(index).padStart(3, '0')}.webp`;
       });
-      // Prioritize the first and last frames, then fill the sequence with four workers.
+      // Decode a coarse pass across the whole video before filling adjacent frames.
+      // Fast swipes can then use a nearby frame instead of jumping to the ending.
       await Promise.all([load(0), load(frameCount - 1)]);
       if (cancelled) return;
-      let next = 1;
-      const worker = async () => { while (next < frameCount - 1 && !cancelled) await load(next++); };
-      Promise.all(Array.from({ length: 4 }, worker));
+      const remaining = Array.from({ length: frameCount - 2 }, (_, index) => index + 1);
+      const queue = [...remaining.filter(index => index % 4 === 0), ...remaining.filter(index => index % 4 !== 0)];
+      let next = 0;
+      const worker = async () => { while (next < queue.length && !cancelled) await load(queue[next++]); };
+      Promise.all(Array.from({ length: 6 }, worker));
 
       media.add({ motion: '(prefers-reduced-motion: no-preference)', reduced: '(prefers-reduced-motion: reduce)' }, ({ conditions }) => {
         if (conditions.reduced || navigator.connection?.saveData) {
@@ -145,14 +148,14 @@ function Hero() {
           return;
         }
         const timeline = gsap.timeline({
-          scrollTrigger: { trigger: element, start: 'top top', end: () => `+=${Math.round(window.innerHeight * 2.8)}`, pin: true, scrub: 0.55, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: 100 },
+          scrollTrigger: { trigger: element, start: 'top top', end: () => `+=${Math.round(element.offsetHeight * 0.95)}`, pin: true, scrub: 0.14, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: 100 },
         });
-        timeline.to(state, { frame: frameCount - 1, duration: 1, ease: 'none', onUpdate: draw }, 0);
-        timeline.to('.hero-intro', { autoAlpha: 0, y: -18, duration: 0.22 }, 0.05);
-        timeline.fromTo('.hero-extended', { opacity: 0 }, { opacity: 1, duration: 0.25, ease: 'power1.inOut' }, 0.92);
-        timeline.fromTo('.hero-copy', { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 1.02);
-        timeline.fromTo('.hero-actions', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.2, ease: 'power2.out' }, 1.15);
-        timeline.to({}, { duration: 0.5 });
+        timeline.to(state, { frame: frameCount - 1, duration: 0.78, ease: 'none', onUpdate: draw }, 0);
+        timeline.to('.hero-scroll-cue', { autoAlpha: 0, y: -8, duration: 0.12 }, 0.04);
+        timeline.fromTo('.hero-extended', { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'power1.inOut' }, 0.7);
+        timeline.fromTo('.hero-copy', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.15, ease: 'power2.out' }, 0.68);
+        timeline.fromTo('.hero-actions', { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.76);
+        timeline.to({}, { duration: 0.12 }, 0.88);
         return () => { state.frame = frameCount - 1; draw(); };
       }, element);
       if (!cancelled) ScrollTrigger.refresh();
@@ -175,7 +178,7 @@ function Hero() {
     </div>
     <div className="hero-shade" />
     <div className="container hero-inner">
-      <div className="hero-intro"><span className="eyebrow">SEU CENTRO AUTOMOTIVO EM MACEIÓ</span><p>CONFIANÇA<br />EM CADA<br /><span>QUILÔMETRO.</span></p><button className="text-link" onClick={skip}>Conheça a Conficar <ArrowUpRightIcon size={20} /></button></div>
+      <button className="hero-scroll-cue" onClick={skip}><span>Role para conhecer</span><ArrowDownIcon size={22} weight="light" /></button>
       <div className="hero-copy"><p className="eyebrow">ENERGIA E CONFIANÇA</p><h1>SEMPRE<br /><span>AO SEU LADO</span></h1><p className="hero-description">Baterias, troca de óleo, freios, suspensão<br className="desktop-break" /> e muito mais. <strong>Seu carro em boas mãos.</strong></p></div>
       <div className="hero-actions">
         <div className="hero-services">
