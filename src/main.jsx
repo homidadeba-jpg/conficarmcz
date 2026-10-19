@@ -91,8 +91,13 @@ function Hero() {
     let frameCount = 72;
     const state = { frame: 0 };
     const media = gsap.matchMedia();
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData) {
+    const showStatic = () => {
+      element.classList.remove('is-sequence');
       element.classList.add('is-static');
+      element.querySelector('.hero-poster').src = '/frames/071.webp';
+    };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData) {
+      showStatic();
       return;
     }
     element.classList.add('is-sequence');
@@ -118,7 +123,7 @@ function Hero() {
         const response = await fetch('/frames/manifest.json');
         if (!response.ok) throw new Error('Sequence unavailable');
         manifest = await response.json();
-      } catch { element.classList.remove('is-sequence'); element.classList.add('is-static'); return; }
+      } catch { showStatic(); return; }
       if (cancelled) return;
       frameCount = manifest.count;
       surface.width = manifest.width;
@@ -150,9 +155,10 @@ function Hero() {
         const timeline = gsap.timeline({
           scrollTrigger: { trigger: element, start: 'top top', end: () => `+=${Math.round(element.offsetHeight * 0.95)}`, pin: true, scrub: 0.14, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: 100 },
         });
-        timeline.to(state, { frame: frameCount - 1, duration: 0.78, ease: 'none', onUpdate: draw }, 0);
+        // Keep the same canvas, crop and decoded frame through the text reveal
+        // and pin release. Reversing the timeline resumes this exact sequence.
+        timeline.fromTo(state, { frame: 0 }, { frame: frameCount - 1, duration: 0.78, ease: 'none', onUpdate: draw }, 0);
         timeline.to('.hero-scroll-cue', { autoAlpha: 0, y: -8, duration: 0.12 }, 0.04);
-        timeline.fromTo('.hero-extended', { opacity: 0 }, { opacity: 1, duration: 0.16, ease: 'power1.inOut' }, 0.7);
         timeline.fromTo('.hero-copy', { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.15, ease: 'power2.out' }, 0.68);
         timeline.fromTo('.hero-actions', { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.12, ease: 'power2.out' }, 0.76);
         timeline.to({}, { duration: 0.12 }, 0.88);
@@ -174,11 +180,6 @@ function Hero() {
     <div className="hero-visual" aria-hidden="true">
       <img className="hero-poster" src="/images/hero-inicio.webp" width="720" height="1280" fetchPriority="high" alt="" />
       <canvas ref={canvas} className="hero-canvas" />
-      <img className="hero-extended" src="/images/hero-final-v2.webp" width="720" height="1280" alt="" onLoad={event => event.currentTarget.classList.add('is-loaded')} onError={event => {
-        const image = event.currentTarget;
-        image.classList.remove('is-loaded');
-        if (!image.dataset.fallback) { image.dataset.fallback = 'true'; image.src = '/frames/071.webp'; }
-      }} />
     </div>
     <div className="hero-shade" />
     <div className="container hero-inner">

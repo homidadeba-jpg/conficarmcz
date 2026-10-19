@@ -22,7 +22,7 @@ O endereço solicitado `conficarmcz.vercel.app` já estava em uso e não aparece
 
 ## Abertura com rolagem
 
-O vídeo enviado pelo cliente foi convertido em quadros WebP. O início mostra apenas a fachada com uma indicação discreta para rolar. O ScrollTrigger prende o hero por uma distância equivalente a 95% da altura da seção e controla a sequência em canvas nos dois sentidos, com resposta curta de 0,14 segundo. Os textos, serviços e botões aparecem perto do final do vídeo. A composição final tem uma breve pausa antes da liberação da rolagem. Não há interceptação de gestos nem rolagem artificial.
+O vídeo enviado pelo cliente foi convertido em quadros WebP. O início mostra apenas a fachada com uma indicação discreta para rolar. O ScrollTrigger prende o hero por uma distância equivalente a 95% da altura da seção e controla a sequência em canvas nos dois sentidos, com resposta curta de 0,14 segundo. Os textos, serviços e botões aparecem perto do final do vídeo. O próprio canvas permanece no último quadro durante a breve pausa e a liberação da rolagem, sem troca para fotografia, mudança de enquadramento ou transição entre imagens. Ao voltar, a mesma sequência retrocede. Não há interceptação de gestos nem rolagem artificial.
 
 Os quadros iniciais e finais têm prioridade. Seis tarefas carregam primeiro amostras distribuídas pelo vídeo e depois os quadros intermediários, favorecendo gestos rápidos. O consumo de memória da sequência é limitado pela resolução e pela quantidade de quadros. Redução de movimento e economia de dados exibem a composição final estática.
 
