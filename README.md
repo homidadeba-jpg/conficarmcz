@@ -16,7 +16,9 @@ npm run build
 npm run preview
 ```
 
-A Vercel usa o preset Vite e publica a pasta `dist`. O endereço previsto é https://conficarmcz.vercel.app.
+A Vercel usa o preset Vite e publica a pasta `dist`. Site publicado em https://conficarmcz-rho.vercel.app.
+
+O endereço solicitado `conficarmcz.vercel.app` já estava em uso e não aparece entre os aliases da conta `jonas-jr`. A publicação foi feita diretamente pelo CLI. A conexão automática do repositório com a Vercel não foi aceita; para atualizar a produção, execute `npx vercel deploy --prod` na pasta do projeto.
 
 ## Abertura com rolagem
 
