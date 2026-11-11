@@ -252,7 +252,7 @@ function Contact() {
 }
 
 function Footer() {
-  return <footer className="footer"><div className="container"><div className="footer-top"><Brand footer /><p>Energia e confiança.<br /><strong>Sempre ao seu lado.</strong></p><a className="instagram-link" href={INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Instagram da Conficar"><InstagramLogoIcon size={25} /></a></div><div className="footer-bottom"><p>© {new Date().getFullYear()} Conficar Centro Automotivo Ltda.</p><span>Maceió, Alagoas</span><a href="#inicio">Voltar ao início <ArrowUpRightIcon size={17} /></a></div></div></footer>;
+  return <footer className="footer"><div className="container"><div className="footer-top"><Brand footer /><p>Energia e confiança.<br /><strong>Sempre ao seu lado.</strong></p><a className="instagram-link" href={INSTAGRAM} target="_blank" rel="noopener noreferrer" aria-label="Instagram da Conficar"><InstagramLogoIcon size={25} /></a></div><div className="footer-bottom"><p>© {new Date().getFullYear()} Conficar Centro Automotivo Ltda.</p><span>Maceió, Alagoas</span><a href="#inicio">Voltar ao início <ArrowUpRightIcon size={17} /></a><a className="developer-credit" href="https://wa.me/5585999745534" target="_blank" rel="noopener noreferrer" lang="pt-BR">Desenvolvido por <strong>Jonas Jr</strong></a></div></div></footer>;
 }
 
 function MobileDock() {
